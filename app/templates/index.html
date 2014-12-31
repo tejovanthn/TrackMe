@@ -2,7 +2,24 @@
 
 {% block content %}
 <div class="container">
-  <h1>Hello, world!</h1>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {% for activity in goal %}
+            <div class="col-md-2">
+                {{activity}}
+            </div>
+            <div class="col-md-10">
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="{{goal[activity].current}}" aria-valuemin="{{goal[activity].MIN}}" aria-valuemax="{{goal[activity].MAX}}" style="width: {{goal[activity].percent}}%;">
+                        <span>{{goal[activity].current}} / {{goal[activity].MAX}}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
 </div>
 {% endblock %}
 
