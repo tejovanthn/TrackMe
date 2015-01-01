@@ -9,7 +9,6 @@ from managers import util as util_manager
 
 manager = Manager(app)
 
-
 manager.add_command('runserver', Server())
 manager.add_command('shell', Shell())
 

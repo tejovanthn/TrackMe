@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template
-from app import app
+from app import app, cache
 
 from endomondo import MobileApi as Endomondo
 
@@ -10,22 +10,27 @@ from endomondo import MobileApi as Endomondo
 @app.route('/')
 @app.route('/index')
 def index():
-    goal = {'Running': {
-        'current': 2.5,
-        'MIN': 0,
-        'MAX': 1000,
-        'percent': 2.5 * 100 / 1000,
-        }, 'Cycling': {
-        'current': 0,
-        'MIN': 0,
-        'MAX': 1000,
-        'percent': 0 * 100 / 1000,
-        }}
+    goal = {'Running': {'MIN': 0, 'MAX': 1000}, 'Cycling': {'MIN': 0,
+            'MAX': 1000}}
 
-    print [w.distance for w in get_endomondo_workouts(since_id=int(app.config['ENDOMONDO_START']))]
+    # TODO Update from local database?
 
+    workouts = \
+        get_endomondo_workouts(since_id=int(app.config['ENDOMONDO_START'
+                               ]))
+    goal['Running']['current'] = sum([w.distance for w in workouts
+            if w.sport == 0])
+    goal['Cycling']['current'] = sum([w.distance for w in workouts
+            if w.sport == 1 or w.sport == 2])
 
-    return render_template('index.html', goal=goal)
+    goal['Running']['percent'] = goal['Running']['current'] * 100.0 \
+        / goal['Running']['MAX']
+    goal['Cycling']['percent'] = goal['Cycling']['current'] * 100.0 \
+        / goal['Cycling']['MAX']
+
+    notes = [{"id":w.id, "starttime":w.start_time, "note":w.notes} for w in workouts]
+
+    return render_template('index.html', goal=goal, notes=notes)
 
 
 def get_endomondo():
@@ -41,11 +46,10 @@ def get_endomondo_workouts(since_id=None):
     endomondo = get_endomondo()
 
     workouts = endomondo.get_workouts()
-    print since_id
 
     if isinstance(since_id, int):
         return [w for w in workouts if w.id >= since_id]
-    else:
-        return workouts
+
+    return workouts
 
 

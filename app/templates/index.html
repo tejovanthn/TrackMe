@@ -20,6 +20,21 @@
         </div>
     </div>
 
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {% for note in notes %}
+            <div class="col-md-3">
+                <div class="panel panel-default" id="{{note.id}}">
+                    <h3>{{note.starttime}}</h3>
+                    <p>{{note.note}}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+
 </div>
 {% endblock %}
 
