@@ -25,7 +25,7 @@
             {% for note in notes %}
             <div class="col-md-3">
                 <div class="panel panel-default" id="{{note.id}}">
-                    <h3>{{note.starttime}}</h3>
+                    <h3>{{momentjs(note.starttime).fromNow()}}</h3>
                     <p>{{note.note}}</p>
                 </div>
             </div>

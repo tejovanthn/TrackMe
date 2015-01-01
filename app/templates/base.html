@@ -5,12 +5,18 @@
 {% block head %}
 {{super()}}
 {{fixes.ie8()}}
+<script src="{{url_for('static', filename='js/moment.min.js')}}"></script>
 {% endblock %}
 
 {% block styles %}
 {{super()}}
 <link rel="stylesheet" href="{{url_for('static', filename='css/fixes.css')}}">
 {% endblock %}
+
+{% block scripts %}
+{{super()}}
+{% endblock %}
+
 
 {% block navbar %}
 <div class="navbar navbar-default navbar-fixed-top">
