@@ -3,22 +3,65 @@
 {% block content %}
 <div class="container">
 
+    {% for activity in goal %}
     <div class="panel panel-default">
         <div class="panel-body">
-            {% for activity in goal %}
-            <div class="col-md-2">
-                {{activity}}
-            </div>
-            <div class="col-md-10">
+            <div class="col-md-2"  id="{{activity}}"></div>
+            <div class="col-md-10" id="{{activity}}-heatmap"></div>
+            <div class="col-md-offset-2 col-md-10">
                 <div class="progress">
                     <div class="progress-bar" role="progressbar" aria-valuenow="{{goal[activity].current}}" aria-valuemin="{{goal[activity].MIN}}" aria-valuemax="{{goal[activity].MAX}}" style="width: {{goal[activity].percent}}%;">
                         <span>{{goal[activity].current}} / {{goal[activity].MAX}}</span>
                     </div>
                 </div>
             </div>
-            {% endfor %}
+        <script>
+        var rp2 = radialProgress(document.getElementById('{{activity}}'))
+                .label("{{activity}}")
+                .diameter(150)
+                .value({{goal[activity].percent}})
+                .render();
+        
+        function defer(method){
+            if (window.$)
+                method();
+            else
+                setTimeout(function() {defer(method)}, 50);
+        }
+        function calheatmap(){
+            $.getJSON("{{url_for('get_endomondo_cal',sport_id=loop.index0)}}", function(datas){
+
+                values = Object.keys(datas.response).map(function(key){return datas.response[key];});
+                min = Math.min.apply(Math, values)-1;
+                max = Math.max.apply(Math, values)+1;
+
+                var cal = new CalHeatMap();
+                    cal.init({
+                        data: datas.response,
+                        itemSelector: "#{{activity}}-heatmap",
+                        domain: "month",
+                        subdomain: "day",
+                        start : new Date(2014, 11, 28),
+                        range: 13,
+                        subDomainTitleFormat: {
+                            empty: "No workout on {date}",
+                            filled: "{count}km done {connector} {date}"
+                            },
+                        highlight: "now",
+                        legend:d3.range(min, max, (max-min)/5),
+                        legendTitleFormat: {
+                            lower: "Less than {min} kilometers.",
+                            inner: "Between {down} and {up} kilometers.",
+                            upper: "More than {max} kilometers."
+                            },
+                        });
+            });
+        }
+        defer(calheatmap)
+        </script>
         </div>
     </div>
+    {% endfor %}
 
     <div class="panel panel-default">
         <div class="panel-body">
