@@ -39,16 +39,16 @@
                     cal.init({
                         data: datas.response,
                         itemSelector: "#{{activity}}-heatmap",
-                        domain: "month",
-                        subdomain: "day",
-                        start : new Date(2014, 11, 28),
-                        range: 13,
+                        domain: "year",
+                        subDomain: "day",
+                        range: 1,
+                        cellSize: 15,
                         subDomainTitleFormat: {
                             empty: "No workout on {date}",
                             filled: "{count}km done {connector} {date}"
                             },
                         highlight: "now",
-                        legend:d3.range(min, max, (max-min)/5),
+                        legend:d3.range(min, max, (max-min)/4),
                         legendTitleFormat: {
                             lower: "Less than {min} kilometers.",
                             inner: "Between {down} and {up} kilometers.",

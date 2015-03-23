@@ -1,18 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from flask import render_template, jsonify
+from flask import render_template, jsonify, redirect, url_for
 from app import app, cache
 
 from endomondo import MobileApi as Endomondo
 
-goal = {'Running': {'MIN': 0, 'MAX': 1000,  "sport_id": [0]},
-        'Cycling': {'MIN': 0, 'MAX': 10000, "sport_id": [1,2]}}
+import json
+
+goal = {'Running': {'MIN': 0, 'MAX': 1000, 'sport_id': [0]},
+        'Cycling': {'MIN': 0, 'MAX': 10000, 'sport_id': [1, 2]}}
 
 
 @app.route('/')
 @app.route('/index')
 def index():
+    return redirect(url_for('sport'))
+
+
+@app.route('/sport')
+def sport():
 
     # TODO Update from local database?
 
@@ -31,7 +38,7 @@ def index():
 
 #    notes = [{'id': w.id, 'starttime': w.start_time, 'note': w.note}             for w in workouts]
 
-    return render_template('index.html', goal=goal)  # , notes=notes)
+    return render_template('sport.html', goal=goal)  # , notes=notes)
 
 
 @cache.cached(timeout=300, key_prefix='endomain')
@@ -55,13 +62,20 @@ def get_endomondo_workouts(since_id=None):
     return workouts
 
 
-@app.route("/_get_endomondo_cal/<int:sport_id>")
-def get_endomondo_cal(since_id=int(app.config["ENDOMONDO_START"]), sport_id=0):
+@app.route('/_get_endomondo_cal/<sport_id>')
+def get_endomondo_cal(since_id=int(app.config['ENDOMONDO_START']),
+                      sport_id=0):
+
+    sport_id = int(sport_id)
     workouts = get_endomondo_workouts(since_id)
 
-    results = {w.start_time.strftime("%s") : w.distance \
-            for w in workouts if w.sport == sport_id}
+    results = dict((w.start_time.strftime('%s'), w.distance) for w in
+                   workouts if w.sport == sport_id)
 
     return jsonify(response=results)
 
+
+@app.route('/photos')
+def photos():
+    return render_template("photos.html")
 

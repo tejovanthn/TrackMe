@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="col-md-12" id="photos-2014-heatmap"></div>
+        <script>
+        function defer(method){
+            if (window.$)
+                method();
+            else
+                setTimeout(function() {defer(method)}, 50);
+        }
+        function calheatmap(){
+            $.getJSON("{{url_for('static',filename='json/photos_2014.json')}}", function(datas){
+
+                values = Object.keys(datas).map(function(key){return datas[key];});
+                min = Math.min.apply(Math, values);
+                max = Math.max.apply(Math, values);
+
+                var cal = new CalHeatMap();
+                    cal.init({
+                        data: datas,
+                        itemSelector: "#photos-2014-heatmap",
+                        domain: "year",
+                        subDomain: "day",
+                        start : new Date(2014, 0),
+                        subDomainTitleFormat: {
+                            empty: "No clicks on {date}",
+                            filled: "{count}clicks {connector} {date}"
+                            },
+                        highlight: "now",
+                        range: 1,
+                        label: {
+                            position: "top",
+                            align: "center",
+                            },
+                        legend:[10, 20, 100, 200],
+                        legendTitleFormat: {
+                            lower: "Less than {min} clicks.",
+                            inner: "Between {down} and {up} clicks.",
+                            upper: "More than {max} clicks."
+                            },
+                        });
+            });
+        }
+        defer(calheatmap)
+        </script>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+

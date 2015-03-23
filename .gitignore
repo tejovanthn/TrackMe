@@ -58,3 +58,6 @@ target/
 
 # Flask related
 tmp/
+
+# Vim related
+*.sw*
